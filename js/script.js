@@ -37,6 +37,22 @@ const list = ulStudentList.children;
        that will be passed into the parens later when you call or 
        "invoke" the function 
 ***/
+const showPage = (list, page) => {
+   const lastStudent = list.length;
+   const firstPageStudent = (numPerPage * (parseInt(page) - 1) + 1);
+   let lastPageStudent = numPerPage * page;
+   if (lastPageStudent > lastStudent) { 
+      lastPageStudent = lastStudent; 
+   }
+
+   for (let i = 1; i <= lastStudent; i++) {
+      if ((i < firstPageStudent || i > lastPageStudent)) {
+         list[i - 1].style.display = "none";
+      } else {
+         list[i - 1].style.display = "";
+      }
+   }
+}
 
 
 
@@ -46,9 +62,11 @@ const list = ulStudentList.children;
    functionality to the pagination buttons.
 ***/
 const appendPageLinks = (list) => {
+   const numPages = Math.ceil(list.length / numPerPage);
+
    const pageDiv = document.querySelector(".page");
 
-   const numPages = Math.ceil(list.length / numPerPage);
+
    const pagingDiv = document.createElement("div");
    const pagingUL = document.createElement("ul");
    pagingDiv.className = "pagination";
@@ -64,14 +82,11 @@ const appendPageLinks = (list) => {
 
     pagingUL.addEventListener ('click', (e) => {
       e.preventDefault();
-      let navLinks = pagingUL.querySelectorAll("a");
-      for (let i = 0; i < navLinks.length; i++) {
-         navLinks[i].className = "";
-         // if (navLinks[i].classList.contains("active")) {
-         //    navLinks[i].classList.remove("active");
-         // }
-      }
+      pagingUL.querySelectorAll("a").forEach ((navLink) => {
+         navLink.removeAttribute("class");
+      });
       e.target.className = "active";
+      showPage(list, e.target.innerHTML);
     });
     
 }
