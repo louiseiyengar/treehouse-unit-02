@@ -104,7 +104,13 @@ body{
     display: inline;
   }
 
-    .pagination li a{
+  div.allStudents {
+    width: 15%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+    .pagination li a, .pagination div.allStudents a{
       border: 1px solid #eaeaea;
       border-radius: 5px;
       padding: 3px 8px;
@@ -113,7 +119,8 @@ body{
     }
 
     .pagination li a.active,
-    .pagination li a:hover{
+    .pagination li a:hover,
+    .pagination div.allStudents a:hover {
       background-color: #4ba6c3;
       color: #fff;
     }

@@ -42,14 +42,38 @@ function createErrorMessage(errorMessage, parentDiv) {
    errorDiv.innerHTML = errorMessage;
 }
 
-function removeErrorMessage(searchDiv) {
+function removeErrorMessage() {
+   const searchDiv = document.getElementsByClassName("student-search")[0];
    const errorDiv = document.getElementsByClassName("error")[0];
    if (errorDiv) {
       searchDiv.removeChild(errorDiv);
    }
 }
 
-function createSearchArea () {
+function revertSearchNav() {
+   const paginationDiv = document.querySelector("div.pagination");
+   const allStudents = document.querySelector("div.allStudents");
+   const paginationLIs = document.querySelectorAll(".pagination li");
+
+   if (paginationLIs) {
+      Array.from(paginationLIs).forEach(function(navLink) {
+         navLink.style.display = "";
+      });
+   }
+   if (allStudents) {
+      allStudents.parentNode.removeChild(allStudents);
+   }
+}
+
+function activeNavLinks(page) {
+   const navAnchors = document.querySelectorAll(".pagination li a");
+   Array.from(navAnchors).forEach(function(navAnchor) {
+      navAnchor.classList.remove("active");
+   });
+   navAnchors[page - 1].className = "active";
+}
+
+function createSearchArea (list) {
    const headerDiv = document.querySelector(".page-header");
    const searchDiv = document.createElement("div");
    const searchForm = document.createElement("form");
@@ -65,10 +89,25 @@ function createSearchArea () {
    return searchForm;
 }
 
-function initialSearchNav() {
+function initialSearchNav(list) {
    paginationDiv = document.getElementsByClassName("pagination")[0];
-   paginationUL = paginationDiv.firstElementChild.style.display = "none";
+   paginationLIs = document.querySelectorAll(".pagination li");
+   Array.from(paginationLIs).forEach(function(navLink) {
+      navLink.style.display = "none";
+   });
+   const allStudentDiv = document.createElement("div");
+   allStudentDiv.className = "allStudents";
+   const pageA = document.createElement("a");
+   pageA.href = "#";
+   pageA.innerHTML = "Click for All Students List";
+   
 
+   paginationDiv.appendChild(allStudentDiv).appendChild(pageA);
+
+   pageA.addEventListener("click", () => {
+      showAllStudents(list, 1);
+      document.querySelector(".student-search input").value = "";
+   });
 }
 
 const createSearchList = (list, userInput) => {
@@ -109,6 +148,7 @@ const createSearchList = (list, userInput) => {
 }
  
 const addSearchForm = (list) => {
+   let searchNavExists = false;
    searchForm = createSearchArea ();
 
    searchInput = searchForm.firstElementChild;
@@ -116,14 +156,15 @@ const addSearchForm = (list) => {
 
    searchForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      removeErrorMessage(searchDiv);
+      removeErrorMessage();
       
-      const userInput = searchInput.value; 
+      const userInput = searchInput.value;
       if (!userInput.trim()) {
          createErrorMessage("Please enter a student name or email to search", searchDiv);
       } else {
          const numToShow = createSearchList(list, userInput);
 
+         //initialSearchNav(list);
          if (numToShow === 0) {
             createErrorMessage("Your search found no students", searchDiv);
          }
@@ -131,23 +172,22 @@ const addSearchForm = (list) => {
    });
 
    searchInput.addEventListener('keyup' , (e) => {
-      removeErrorMessage(searchDiv);
+      removeErrorMessage();
       
       const userInput = searchInput.value;
       if (!userInput.trim()) {
          showAllStudents(list, 1);
       } else {
          const numToShow = createSearchList(list, userInput);
-
+         initialNavExists = document.querySelector("div.allStudents");
+         if (!initialNavExists) {
+            initialSearchNav(list);
+         }
          if (numToShow === 0) {
             createErrorMessage("Your search found no students", searchDiv);
          }  
       }
    });
-}
-
-const processSearchLinks = () => {
-
 }
 
 /*** 
@@ -172,7 +212,6 @@ const appendPageLinks = (list, numToShow, isSearch) => {
       pageA.innerHTML = i;
       pagingUL.appendChild(pageLI).appendChild(pageA);
    }
-    pagingUL.firstElementChild.firstElementChild.className = "active";
 
     pagingUL.addEventListener ('click', (e) => {
       e.preventDefault();
@@ -180,7 +219,6 @@ const appendPageLinks = (list, numToShow, isSearch) => {
          pagingUL.querySelectorAll("a").forEach ((navLink) => {
             navLink.removeAttribute("class");
          });
-         e.target.className = "active";
          showAllStudents(list, e.target.innerHTML);
          window.scroll(0,0);
       }
@@ -188,6 +226,11 @@ const appendPageLinks = (list, numToShow, isSearch) => {
 }
 
 const showAllStudents = (list, page) => {
+   removeErrorMessage();
+   revertSearchNav();
+   activeNavLinks(page);
+   const navLink = document.querySelectorAll(".pagination li a")[page - 1];
+   navLink.className = "active";
    const lastStudent = list.length;
    const firstPageStudent = (numPerPage * (parseInt(page) - 1) + 1);
    let lastPageStudent = numPerPage * page;
