@@ -89,7 +89,7 @@ function createSearchArea (list) {
    return searchForm;
 }
 
-function initialSearchNav(list) {
+function createAllStudentsButton(list) {
    paginationDiv = document.getElementsByClassName("pagination")[0];
    paginationLIs = document.querySelectorAll(".pagination li");
    Array.from(paginationLIs).forEach(function(navLink) {
@@ -163,8 +163,7 @@ const addSearchForm = (list) => {
          createErrorMessage("Please enter a student name or email to search", searchDiv);
       } else {
          const numToShow = createSearchList(list, userInput);
-
-         //initialSearchNav(list);
+         
          if (numToShow === 0) {
             createErrorMessage("Your search found no students", searchDiv);
          }
@@ -179,9 +178,9 @@ const addSearchForm = (list) => {
          showAllStudents(list, 1);
       } else {
          const numToShow = createSearchList(list, userInput);
-         initialNavExists = document.querySelector("div.allStudents");
-         if (!initialNavExists) {
-            initialSearchNav(list);
+         allStudentsButton = document.querySelector("div.allStudents");
+         if (!allStudentsButton) {
+            createAllStudentsButton(list);
          }
          if (numToShow === 0) {
             createErrorMessage("Your search found no students", searchDiv);
@@ -190,21 +189,20 @@ const addSearchForm = (list) => {
    });
 }
 
-/*** 
-   Create the `appendPageLinks function` to generate, append, and add 
-   functionality to the pagination buttons.
-***/
-const appendPageLinks = (list, numToShow, isSearch) => {
-   const numPages = Math.ceil(numToShow / numPerPage);
+/*
+   This function will put the appropriate number of navigation page links for all students.
+*/
+const appendPageLinks = (list) => {
+   const numPages = Math.ceil(list.length / numPerPage);
 
+   //create a page navigation area
    const pageDiv = document.querySelector(".page");
-
-
    const pagingDiv = document.createElement("div");
    const pagingUL = document.createElement("ul");
    pagingDiv.className = "pagination";
    pageDiv.appendChild(pagingDiv).appendChild(pagingUL);
 
+   //add links and anchors for each page
    for (let i = 1; i <= numPages; i++) {
       let pageLI = document.createElement("li");
       let pageA = document.createElement("a");
@@ -213,14 +211,12 @@ const appendPageLinks = (list, numToShow, isSearch) => {
       pagingUL.appendChild(pageLI).appendChild(pageA);
    }
 
+   //event listener for each page navigation button
     pagingUL.addEventListener ('click', (e) => {
       e.preventDefault();
       if (e.target.tagName === "A") {
-         pagingUL.querySelectorAll("a").forEach ((navLink) => {
-            navLink.removeAttribute("class");
-         });
-         showAllStudents(list, e.target.innerHTML);
-         window.scroll(0,0);
+         showAllStudents(list, e.target.innerHTML);   //when page nav button clicked, show students for that page.
+         window.scroll(0,0);     //scroll to top of new page.
       }
     });
 }
@@ -229,8 +225,7 @@ const showAllStudents = (list, page) => {
    removeErrorMessage();
    revertSearchNav();
    activeNavLinks(page);
-   const navLink = document.querySelectorAll(".pagination li a")[page - 1];
-   navLink.className = "active";
+
    const lastStudent = list.length;
    const firstPageStudent = (numPerPage * (parseInt(page) - 1) + 1);
    let lastPageStudent = numPerPage * page;
@@ -247,11 +242,20 @@ const showAllStudents = (list, page) => {
    }
 }
 
-const numPerPage = 10;
+//BEGIN
+const numPerPage = 10;  //Number of students to appear on one page
+
+/*
+   For this event listener, when DOM Content is loaded, 
+   - get list of students from HTML
+   - show all students on approprate pages
+   - append nav page links
+   - add a search input field and search button
+*/
 document.addEventListener('DOMContentLoaded', () => {
-   const ulStudentList = document.querySelector("ul.student-list");
-   const list = ulStudentList.children;
-   appendPageLinks(list, list.length, false);
+   const list = document.querySelector("ul.student-list").children;
+
+   appendPageLinks(list);
    showAllStudents(list,1);
    addSearchForm(list);
 });
