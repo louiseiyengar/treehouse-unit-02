@@ -117,3 +117,10 @@ body{
       background-color: #4ba6c3;
       color: #fff;
     }
+
+  div.error {
+    padding: 2%;
+    color: red;
+    text-align: center;
+    font-size: 80%;
+  }
