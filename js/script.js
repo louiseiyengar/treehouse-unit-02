@@ -115,8 +115,8 @@ function createAllStudentsButton(list) {
 
    //Click event listenter for 'All Students' button.  Will cause full student list to show.
    pageA.addEventListener("click", () => {
-      showAllStudents(list, 1);
       appendPageLinks(list);
+      showAllStudents(list, 1);
       document.querySelector(".student-search input").value = "";    //removes user input from search form input
       removeAllStudentButton();
       searchArray = [];
@@ -297,9 +297,8 @@ const appendPageLinks = (list) => {
 */
 const showAllStudents = (list, page) => {
    removeErrorMessage();   //remove the an error message from the search are if it exists from the search
-   //revertSearchNav();      //remove 'show all students' and remove 'display = none' from navigation link if search has been done.
-      //remove class = active on page nav buttons and set appropriate page nav link to class = active
-   activeNavLinks(page);
+   activeNavLinks(page);   //set active class on approprate page link
+
    //determine first and last students to appear on a page.
    const lastStudent = list.length;
    const firstPageStudent = (numPerPage * (parseInt(page) - 1) + 1);
@@ -310,7 +309,6 @@ const showAllStudents = (list, page) => {
   
    //loop through list collection to display appropriate students on a page.
    for (let i = 1; i <= lastStudent; i++) {
-
       if ((i < firstPageStudent || i > lastPageStudent)) {
          list[i - 1].style.display = "none";
       } else {
