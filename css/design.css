@@ -43,8 +43,6 @@ body{
       color: #fff
     }
 
-.student-list{}
-
   .student-item{
     margin: 0 0 20px 0;
     padding: 0 0 20px 0;
@@ -110,12 +108,13 @@ body{
     margin-right: auto;
   }
 
-    .pagination li a, .pagination div.allStudents a{
+    .pagination li a, .pagination div.allStudents a {
       border: 1px solid #eaeaea;
       border-radius: 5px;
       padding: 3px 8px;
       text-decoration: none;
       color: #4ba6c3;
+      white-space: nowrap;
     }
 
     .pagination li a.active,
@@ -126,7 +125,7 @@ body{
     }
 
     div.allStudents {
-      margin-top: 2%;
+      margin-top: 3%;
     }
 
   div.error {
