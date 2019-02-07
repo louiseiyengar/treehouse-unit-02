@@ -125,6 +125,10 @@ body{
       color: #fff;
     }
 
+    div.allStudents {
+      margin-top: 2%;
+    }
+
   div.error {
     padding: 2%;
     color: red;

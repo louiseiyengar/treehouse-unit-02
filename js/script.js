@@ -2,10 +2,6 @@
 Treehouse Techdegree:
 FSJS project 2 - List Filter and Pagination
 ******************************************/
-   
-
-
-
 
 /*
    This function inserts an error message that might appear below the search form.
@@ -33,16 +29,8 @@ function removeErrorMessage() {
    made a search.  It re-displays all page navigation links and removes the view
    'All Students' button.
 */
-function revertSearchNav() {
-   const paginationDiv = document.querySelector("div.pagination");
+function removeAllStudentButton() {
    const allStudents = document.querySelector("div.allStudents");
-   const paginationLIs = document.querySelectorAll(".pagination li");
-
-   if (paginationLIs) {
-      Array.from(paginationLIs).forEach(function(navLink) { //re-display all page navigation links
-         navLink.style.display = "";
-      });
-   }
    if (allStudents) {
       allStudents.parentNode.removeChild(allStudents);   //remove the 'view all students' button
    }
@@ -54,10 +42,13 @@ function revertSearchNav() {
 */
 function activeNavLinks(page) {
    const navAnchors = document.querySelectorAll(".pagination li a");
-   Array.from(navAnchors).forEach(function(navAnchor) {
-      navAnchor.classList.remove("active");
-   });
-   navAnchors[page - 1].className = "active";
+
+   if (navAnchors.length) {
+      Array.from(navAnchors).forEach(function(navAnchor) {
+         navAnchor.classList.remove("active");
+      });
+      navAnchors[page - 1].className = "active";
+   }
 }
 
 /*
@@ -92,19 +83,28 @@ function createPageNavArea () {
    return (pagingUL);
 }
 
+function removePageNav() {
+   paginationUL = document.querySelector(".pagination ul");
+   while (paginationUL.hasChildNodes()) {   
+      paginationUL.removeChild(paginationUL.firstChild);
+    }
+}
+
 /*
    This function creates a navigation button for the search.  It allows the user to view
    all student pages after the search is complete.
    - It also adds a click event listener to create the 'all students' pages.
 */
 function createAllStudentsButton(list) {
-   paginationDiv = document.getElementsByClassName("pagination")[0];
-   paginationLIs = document.querySelectorAll(".pagination li");
+   paginationDiv = document.querySelector("div.pagination");
+  // removePageNav();
 
    //sets the existing page navigation links to display = none
-   Array.from(paginationLIs).forEach(function(navLink) {
-      navLink.style.display = "none";
-   });
+
+   
+   // Array.from(paginationLIs).forEach(function(navLink) {
+   //    navLink.style.display = "none";
+   // });
    //Creates a div for the 'all students' button (which is actually not a button)
    const allStudentDiv = document.createElement("div");
    allStudentDiv.className = "allStudents";
@@ -116,7 +116,10 @@ function createAllStudentsButton(list) {
    //Click event listenter for 'All Students' button.  Will cause full student list to show.
    pageA.addEventListener("click", () => {
       showAllStudents(list, 1);
+      appendPageLinks(list);
       document.querySelector(".student-search input").value = "";    //removes user input from search form input
+      removeAllStudentButton();
+      searchArray = [];
    });
 }
 
@@ -131,6 +134,7 @@ const createSearchList = (list, userInput) => {
    let count = 0;
    let nameArray;
    let email;
+   searchArray = [];
 
    //Set display = none to all students
    for (let i = 0; i < list.length; i++) {
@@ -149,23 +153,34 @@ const createSearchList = (list, userInput) => {
       email = list[j].firstElementChild.children[2].innerHTML
       if (userInputArray.length > 1) {    //If user input matches name
          if (name.search(userInput) === 0) {
-            list[j].style.display = "";
-            count++;
+            //list[j].style.display = "";
+            searchArray.push(list[j]);
+            //count++;
          }
       } else {
          if (email.search(userInput) === 0) {   //If user input matches email
-            list[j].style.display = "";
-            count++;
+            //list[j].style.display = "";
+            searchArray.push(list[j]);
+         //   count++;
          } else {
             //check first and last name against user input
             if ((nameArray[0].search(userInputArray[0]) === 0) || (nameArray[1].search(userInputArray[0]) === 0)) {
-               list[j].style.display = "";
-               count++;
+              // list[j].style.display = "";
+              searchArray.push(list[j]);
+              // count++;
             }
          }
       }
    }
-   return count;  //return number of students found in search for error processing/
+
+   // if (searchArray.length <= numPerPage) {
+   //    appendPageLinks(searchArray, true);
+   //    searchArray.forEach(function(student) {
+   //       student.style.display = "";
+   //     });
+
+   // }
+   return (searchArray)  //return number of students found in search for error processing/
 }
 
 /*
@@ -173,14 +188,19 @@ const createSearchList = (list, userInput) => {
    Nav button on the page so the user can go back to viewing the full student list.
 */
 function displaySearchStudents(userInput, searchDiv, list) {
-   const numToShow = createSearchList(list, userInput);  //Create and display List of students that meet Search criteria
+   const numToShow = createSearchList(list, userInput).length;  //Create and display List of students that meet Search criteria
    allStudentsButton = document.querySelector("div.allStudents");
    if (!allStudentsButton) {
       createAllStudentsButton(list);      //put a button on the page so user can view all students after seeing search.
    }
    if (numToShow === 0) {
       createErrorMessage("Your search found no students", searchDiv);
-   } 
+   } else {
+         //TO DO: navigation for more> 10 search students
+         //appendPageLinks(searchArray);
+         appendPageLinks(searchArray);
+         showAllStudents(searchArray, 1);
+      }
 }
  
 /*
@@ -200,10 +220,12 @@ const addSearchForm = (list) => {
    searchForm.addEventListener('submit', (e) => {
       e.preventDefault();
       removeErrorMessage();      //remove error message if one exists from previous search
+      removePageNav();
       
       const userInput = searchInput.value; //get user input
       if (!userInput.trim()) {
          createErrorMessage("Please enter a student name or email to search", searchDiv);
+         appendPageLinks(list);
       } else {
          displaySearchStudents(userInput, searchDiv, list); //find and display students who match input value
       }
@@ -211,11 +233,14 @@ const addSearchForm = (list) => {
 
    //event listener for keyup event the Search Form
    searchInput.addEventListener('keyup' , (e) => {
+      removePageNav();
       removeErrorMessage();   //remove error message if one exists from previous search
       
       const userInput = searchInput.value;   //get user input
       if (!userInput.trim()) {   //This will occur if user backspaces and deletes value in search input field
+         appendPageLinks(list);
          showAllStudents(list, 1);  //In that case, show all student list again.
+         removeAllStudentButton();
       } else {
          displaySearchStudents(userInput, searchDiv, list); //find and display students who match input value
       }
@@ -226,29 +251,44 @@ const addSearchForm = (list) => {
    This function will put the appropriate number of navigation page links for all students.
 */
 const appendPageLinks = (list) => {
+
    const numPages = Math.ceil(list.length / numPerPage);
-
-   //create a page navigation area
-   pagingUL = createPageNavArea ();
-
+   let pagingUL = document.querySelector(".pagination ul");
+   if (!pagingUL) {
+      //create a page navigation area
+         pagingUL = createPageNavArea ();
+   } 
+   //sets the existing page navigation links to display = none
+   removePageNav();
+   
    //add links and anchors for each page
-   for (let i = 1; i <= numPages; i++) {
-      let pageLI = document.createElement("li");
-      let pageA = document.createElement("a");
-      pageA.href = "#";
-      pageA.innerHTML = i;
-      pagingUL.appendChild(pageLI).appendChild(pageA);
-   }
-
-   //event listener for each page navigation button
-    pagingUL.addEventListener ('click', (e) => {
-      e.preventDefault();
-      if (e.target.tagName === "A") {
-         showAllStudents(list, e.target.innerHTML);   //when page nav button clicked, show students for that page.
-         window.scroll(0,0);     //scroll to top of new page.
+   if (numPages > 1) {
+      for (let i = 1; i <= numPages; i++) {
+         let pageLI = document.createElement("li");
+         let pageA = document.createElement("a");
+         pageA.href = "#";
+         pageA.innerHTML = i;
+         pagingUL.appendChild(pageLI).appendChild(pageA);
       }
-    });
+
+      let clickList;
+      //event listener for each page navigation button
+      pagingUL.addEventListener ('click', (e) => {
+         if (searchArray.length) {
+            clickList = searchArray;
+         } else {
+            clickList = list;
+         }
+         e.preventDefault();
+         if (e.target.tagName === "A") {
+            showAllStudents(clickList, e.target.innerHTML);   //when page nav button clicked, show students for that page.
+            
+            window.scroll(0,0);     //scroll to top of new page.
+         }
+      });
+   }
 }
+
 
 
 /*
@@ -257,9 +297,9 @@ const appendPageLinks = (list) => {
 */
 const showAllStudents = (list, page) => {
    removeErrorMessage();   //remove the an error message from the search are if it exists from the search
-   revertSearchNav();      //remove 'show all students' and remove 'display = none' from navigation link if search has been done.
-   activeNavLinks(page);   //remove class = active on page nav buttons and set appropriate page nav link to class = active
-
+   //revertSearchNav();      //remove 'show all students' and remove 'display = none' from navigation link if search has been done.
+      //remove class = active on page nav buttons and set appropriate page nav link to class = active
+   activeNavLinks(page);
    //determine first and last students to appear on a page.
    const lastStudent = list.length;
    const firstPageStudent = (numPerPage * (parseInt(page) - 1) + 1);
@@ -267,9 +307,10 @@ const showAllStudents = (list, page) => {
    if (lastPageStudent > lastStudent) { 
       lastPageStudent = lastStudent; 
    }
-
+  
    //loop through list collection to display appropriate students on a page.
    for (let i = 1; i <= lastStudent; i++) {
+
       if ((i < firstPageStudent || i > lastPageStudent)) {
          list[i - 1].style.display = "none";
       } else {
@@ -280,6 +321,7 @@ const showAllStudents = (list, page) => {
 
 //BEGIN
 const numPerPage = 10;  //Number of students to appear on one page
+let searchArray = [];
 
 /*
    For this event listener, when DOM Content is loaded, 
