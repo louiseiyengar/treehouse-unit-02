@@ -25,9 +25,7 @@ function removeErrorMessage() {
 }
 
 /*
-   This function is invoked when we view all students after having
-   made a search.  It re-displays all page navigation links and removes the view
-   'All Students' button.
+   This function removes the view 'All Students' button, if it exists on the page.
 */
 function removeAllStudentButton() {
    const allStudents = document.querySelector("div.allStudents");
@@ -129,8 +127,10 @@ function createAllStudentsButton(list) {
    - Students found in the search are pushed into a searchArray
 */
 const createSearchList = (list, userInput) => {
-   let count = 0;
    let nameArray;
+   let name;
+   let fName;
+   let lName;
    let email;
    searchArray = [];
 
@@ -147,23 +147,22 @@ const createSearchList = (list, userInput) => {
    userInputArray = userInput.split(" ");
 
    for (let j = 0; j <  list.length; j++) {
-      let name = list[j].firstElementChild.children[1].innerHTML; //get student name
-      nameArray = name.split(" "); //create array for student name to examine first and last name
+     // for (let j = 4; j < 6; j++) {
+      name = list[j].firstElementChild.children[1].innerHTML; //get student name
 
+      //get first and last names to check
+      nameArray = name.split(" "); //create array for student name to examine first and last name
+      fName = nameArray.shift();
+      lName = nameArray.join(" "); //if more than one space in rest of name (ie. lilou le gall)
+      
       email = list[j].firstElementChild.children[2].innerHTML
-      if (userInputArray.length > 1) {    //If user input matches name
-         if (name.search(userInput) === 0) {
+
+      //compare student name to user input, push ot searchArray if match found
+      if (name.search(userInput) === 0 
+      || (email.search(userInput) === 0) 
+      || (fName.search(userInput) === 0)
+      || (lName.search(userInput) === 0)) {
             searchArray.push(list[j]);
-         }
-      } else {
-         if (email.search(userInput) === 0) {   //If user input matches email
-            searchArray.push(list[j]);
-         } else {
-            //check first and last name against user input
-            if ((nameArray[0].search(userInputArray[0]) === 0) || (nameArray[1].search(userInputArray[0]) === 0)) {
-              searchArray.push(list[j]);
-            }
-         }
       }
    }
    return (searchArray)  //Return the array of students found in search
