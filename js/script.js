@@ -158,7 +158,7 @@ const createSearchList = (list, userInput) => {
       email = list[j].firstElementChild.children[2].innerHTML
 
       //compare student name to user input, push ot searchArray if match found
-      if (name.search(userInput) === 0 
+      if ((name.search(userInput) === 0) 
       || (email.search(userInput) === 0) 
       || (fName.search(userInput) === 0)
       || (lName.search(userInput) === 0)) {
