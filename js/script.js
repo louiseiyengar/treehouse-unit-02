@@ -140,14 +140,10 @@ const createSearchList = (list, userInput) => {
    }
 
    //CREATE ARRAY OF FOUND STUDENTS -- push li elements for students that match user input
-
    //if user enters more than one space between characters, ensure only one space
    userInput = userInput.trim().toLowerCase().replace(/  +/g, ' ');   
-   //Split user input into an array so first name and last name can be viewed.
-   userInputArray = userInput.split(" ");
 
    for (let j = 0; j <  list.length; j++) {
-     // for (let j = 4; j < 6; j++) {
       name = list[j].firstElementChild.children[1].innerHTML; //get student name
 
       //get first and last names to check
