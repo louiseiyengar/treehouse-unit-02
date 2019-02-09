@@ -2,6 +2,9 @@
 Treehouse Techdegree:
 FSJS project 2 - List Filter and Pagination
 ******************************************/
+//Global Constants
+const numPerPage = 10;  //Number of students to appear on one page
+let searchArray = [];   //This will be the array of students from a search
 
 /*
    This function inserts an error message that might appear below the search form.
@@ -217,6 +220,7 @@ const addSearchForm = (list) => {
       
       const userInput = searchInput.value;   //get user input
       if (!userInput.trim()) {   //This will occur if user backspaces and deletes value in search input field
+         searchArray = [];
          appendPageLinks(list);
          showStudents(list, 1);  //In that case, show all student list again.
          removeAllStudentButton();
@@ -293,8 +297,6 @@ const appendPageLinks = (list) => {
 }
 
 //BEGIN
-const numPerPage = 10;  //Number of students to appear on one page
-let searchArray = [];   //This will be the array of students from a search
 
 /*
    For this event listener, when DOM Content is loaded, 
