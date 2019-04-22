@@ -3,7 +3,7 @@
 For this project, I took an HTML page with a list of students and divided the students into pages with a set 
 number of students on each page.
 
-I also put a search for on the top right of the page, and the search will be triggered by a keyup in the search input or
+I also put a search form on the top right of the page, and the search will be triggered by a keyup in the search input or
 a submit of the search form.
 
 Some things to note: You can search by **first name, last name, or email**.
